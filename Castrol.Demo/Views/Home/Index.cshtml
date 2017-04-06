@@ -1,31 +1,182 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model Castrol.Demo.Models.CastrolDataModel
+@{
+    ViewBag.Title = "Home";
+    bool editableData = Convert.ToBoolean(ViewBag.EditableData);
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="col-xs-12">
+        <h2>Castrol EVHC Data Entry via FTP</h2>
+        <hr />
     </div>
 </div>
+<div class="row">
+    <form class="form-horizontal" action="@Url.Action("UploadCastrolData","Home")" method="post">
+        @Html.AntiForgeryToken()
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.CustomerName, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @if (!editableData)
+                    { }
+                    @Html.TextBoxFor(x => x.CustomerName, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.CustomerName)</span>
+                </div>
+            </div>
+            </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Vehicle, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Vehicle, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Vehicle)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.VehicleModel, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.VehicleModel, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.VehicleModel)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Registration, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Registration, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Registration)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.WIP, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.WIP, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.WIP)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="form-group">
+                @Html.LabelFor(x => x.EVHCDateTimeIn, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+
+                    @Html.TextBoxFor(x => x.EVHCDateTimeIn, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.EVHCDateTimeIn)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.VIN, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.VIN, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.VIN)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.HomePhone, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.HomePhone, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.HomePhone)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Mobile, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Mobile, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Mobile)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.WorkPhone, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.WorkPhone, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.WorkPhone)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Email, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Email)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Fax, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Fax, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Fax)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.SalesAdvisor, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.SalesAdvisor, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.SalesAdvisor)</span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset @(!editableData ? "disabled" : null)>
+            <div class="form-group">
+                @Html.LabelFor(x => x.Mileage, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.Mileage, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.Mileage)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.DateVehicleFirstRegistered, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.DateVehicleFirstRegistered, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.DateVehicleFirstRegistered)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.ContactPhone, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.ContactPhone, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.ContactPhone)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.CarDateTimeDueOut, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.CarDateTimeDueOut, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.CarDateTimeDueOut)</span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(x => x.CustomerWaiting, new { @class = "col-sm-3 control-label" })
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(x => x.CustomerWaiting, new { @class = "form-control" })
+                    <span class="text-danger">@Html.ValidationMessageFor(x => x.CustomerWaiting)</span>
+                </div>
+            </div>
+        </fieldset>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-danger">Upload</button>
+                </div>
+            </div>
+</form>
+</div>
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

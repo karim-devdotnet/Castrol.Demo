@@ -1,6 +1,13 @@
-﻿using System;
+﻿using Castrol.Demo.Models;
+using CsvHelper;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -8,23 +15,83 @@ namespace Castrol.Demo.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        private readonly CultureInfo cultureInfo = new CultureInfo("en");
+        [HttpGet]
+        public ActionResult Index(bool editableData = false)
         {
-            return View();
+            var model = new CastrolDataModel();
+            ViewBag.EditableData = editableData;
+            model.CustomerName = HttpContext.Request.QueryString["customername"];
+            model.Vehicle = HttpContext.Request.QueryString["vehicle"];
+            model.VehicleModel = HttpContext.Request.QueryString["model"];
+            model.Registration = HttpContext.Request.QueryString["registration"];
+            model.VIN = HttpContext.Request.QueryString["vin"];
+            model.Email = HttpContext.Request.QueryString["email"];
+            model.ContactPhone = HttpContext.Request.QueryString["telefon"];
+            model.Fax = HttpContext.Request.QueryString["fax"];
+            var mileage = 0;
+            int.TryParse(HttpContext.Request.QueryString["mileage"], out mileage);
+            model.Mileage = mileage;
+
+            model.EVHCDateTimeIn = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
+            model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
+            model.CarDateTimeDueOut = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
+
+            return View(model);
         }
 
-        public ActionResult About()
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult UploadCastrolData(CastrolDataModel model)
         {
-            ViewBag.Message = "Your application description page.";
+            if(ModelState.IsValid)
+            {
+                using (var stream = new StreamWriter(Server.MapPath("~/Upload/CastrolData.csv")))
+                {
+                    using (var csv = new CsvWriter(stream))
+                    {
+                        csv.Configuration.HasHeaderRecord = false;
+                        csv.Configuration.Delimiter = ",";
+                        csv.Configuration.QuoteAllFields = true;
+                        csv.WriteRecord(model);
+                    }
+                }
 
-            return View();
+                SaveOnFtP();
+
+            }
+            return RedirectToAction("Index",model);
         }
 
-        public ActionResult Contact()
+       private void SaveOnFtP()
         {
-            ViewBag.Message = "Your contact page.";
+            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ ConfigurationManager.AppSettings["FtpServer"]}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
+            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+            ftpRequest.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["FtpUser"], ConfigurationManager.AppSettings["FtpPassword"]);
+            ftpRequest.UsePassive = true;
+            ftpRequest.UseBinary = true;
+            ftpRequest.KeepAlive = false;
 
-            return View();
+            try
+            {
+                WebResponse ftpResponse = ftpRequest.GetResponse();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            using (FileStream fs = new FileStream(Server.MapPath("~/Upload/CastrolData.csv"), FileMode.Open))
+            {
+                byte[] fileContents = new byte[fs.Length];
+                fs.Read(fileContents, 0, Convert.ToInt32(fs.Length));
+                using (Stream requestStream = ftpRequest.GetRequestStream())
+                {
+                    requestStream.Write(fileContents, 0, fileContents.Length);
+                }
+            }
+
+            FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
         }
+
     }
 }
