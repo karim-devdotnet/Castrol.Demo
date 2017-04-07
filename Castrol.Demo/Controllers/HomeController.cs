@@ -43,26 +43,31 @@ namespace Castrol.Demo.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult UploadCastrolData(CastrolDataModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                using (var stream = new StreamWriter(Server.MapPath("~/Upload/CastrolData.csv")))
-                {
-                    using (var csv = new CsvWriter(stream))
-                    {
-                        csv.Configuration.HasHeaderRecord = false;
-                        csv.Configuration.Delimiter = ",";
-                        csv.Configuration.QuoteAllFields = true;
-                        csv.WriteRecord(model);
-                    }
-                }
 
-                SaveOnFtP();
+                using (var dataStream = new MemoryStream())
+                {
+                    using (var stream = new StreamWriter(dataStream))
+                    {
+                        using (var csv = new CsvWriter(stream))
+                        {
+                            csv.Configuration.HasHeaderRecord = false;
+                            csv.Configuration.Delimiter = ",";
+                            csv.Configuration.QuoteAllFields = true;
+                            csv.WriteRecord(model);
+                        }
+                    }
+
+                    var data = dataStream.ToArray();
+                    SaveOnFtP(data);
+                }
 
             }
             return RedirectToAction("Index");
         }
 
-       private void SaveOnFtP()
+       private void SaveOnFtP(byte[] inData)
         {
             FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ ConfigurationManager.AppSettings["FtpServer"]}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
             ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
@@ -80,14 +85,9 @@ namespace Castrol.Demo.Controllers
                 throw;
             }
 
-            using (FileStream fs = new FileStream(Server.MapPath("~/Upload/CastrolData.csv"), FileMode.Open))
+            using (Stream requestStream = ftpRequest.GetRequestStream())
             {
-                byte[] fileContents = new byte[fs.Length];
-                fs.Read(fileContents, 0, Convert.ToInt32(fs.Length));
-                using (Stream requestStream = ftpRequest.GetRequestStream())
-                {
-                    requestStream.Write(fileContents, 0, fileContents.Length);
-                }
+                requestStream.Write(inData, 0, inData.Length);
             }
 
             FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
