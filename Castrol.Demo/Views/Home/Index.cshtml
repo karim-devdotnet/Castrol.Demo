@@ -12,163 +12,283 @@
 <div class="row">
     <form class="form-horizontal" action="@Url.Action("UploadCastrolData","Home")" method="post">
         @Html.AntiForgeryToken()
-        <fieldset @(!editableData ? "disabled" : null)>
             <div class="form-group">
                 @Html.LabelFor(x => x.CustomerName, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @if (!editableData)
-                    { }
-                    @Html.TextBoxFor(x => x.CustomerName, new { @class = "form-control" })
+                    @if(editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.CustomerName, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.CustomerName, new { @class = "form-control", @readonly="true" })</text>
+                    }
+
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.CustomerName)</span>
                 </div>
             </div>
-            </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+            
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Vehicle, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Vehicle, new { @class = "form-control" })
+                @if (editableData)
+                {
+                    <text>@Html.TextBoxFor(x => x.Vehicle, new { @class = "form-control" })</text>
+                }
+                else
+                {
+                    <text>@Html.TextBoxFor(x => x.Vehicle, new { @class = "form-control", @readonly = "true" })</text>
+                }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Vehicle)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.VehicleModel, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.VehicleModel, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.VehicleModel, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.VehicleModel, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.VehicleModel)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Registration, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Registration, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.Registration, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.Registration, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Registration)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.WIP, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.WIP, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.WIP, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.WIP, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.WIP)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset>
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.EVHCDateTimeIn, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-
-                    @Html.TextBoxFor(x => x.EVHCDateTimeIn, new { @class = "form-control" })
-                    <span class="text-danger">@Html.ValidationMessageFor(x => x.EVHCDateTimeIn)</span>
+                    <div class="input-group date form_datetime col-md-5" data-date="" data-date-format="mm/dd/yyyy hh:ii" data-link-field="dtp_input1">
+                        @Html.TextBoxFor(x => x.EVHCDateTimeIn, new { @class = "form-control" })
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    </div>
+                    <input type="hidden" id="dtp_input1" value="" />
+                    <br /><br />
+                    <div class="text-danger">@Html.ValidationMessageFor(x => x.EVHCDateTimeIn)</div>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.VIN, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.VIN, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.VIN, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.VIN, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.VIN)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.HomePhone, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.HomePhone, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.HomePhone, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.HomePhone, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.HomePhone)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Mobile, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Mobile, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.Mobile, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.Mobile, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Mobile)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.WorkPhone, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.WorkPhone, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.WorkPhone, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.WorkPhone, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.WorkPhone)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Email, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.Email, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.Email, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Email)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Fax, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Fax, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.Fax, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.Fax, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Fax)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.SalesAdvisor, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.SalesAdvisor, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.SalesAdvisor, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.SalesAdvisor, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.SalesAdvisor)</span>
                 </div>
             </div>
-        </fieldset>
-        <fieldset @(!editableData ? "disabled" : null)>
+        
+        
             <div class="form-group">
                 @Html.LabelFor(x => x.Mileage, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.Mileage, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.Mileage, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.Mileage, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.Mileage)</span>
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor(x => x.DateVehicleFirstRegistered, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.DateVehicleFirstRegistered, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.DateVehicleFirstRegistered, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.DateVehicleFirstRegistered, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.DateVehicleFirstRegistered)</span>
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor(x => x.ContactPhone, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.ContactPhone, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.ContactPhone, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.ContactPhone, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.ContactPhone)</span>
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor(x => x.CarDateTimeDueOut, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.CarDateTimeDueOut, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.CarDateTimeDueOut, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.CarDateTimeDueOut, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.CarDateTimeDueOut)</span>
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor(x => x.CustomerWaiting, new { @class = "col-sm-3 control-label" })
                 <div class="col-sm-9">
-                    @Html.TextBoxFor(x => x.CustomerWaiting, new { @class = "form-control" })
+                    @if (editableData)
+                    {
+                        <text>@Html.TextBoxFor(x => x.CustomerWaiting, new { @class = "form-control" })</text>
+                    }
+                    else
+                    {
+                        <text>@Html.TextBoxFor(x => x.CustomerWaiting, new { @class = "form-control", @readonly = "true" })</text>
+                    }
                     <span class="text-danger">@Html.ValidationMessageFor(x => x.CustomerWaiting)</span>
                 </div>
             </div>
-        </fieldset>
+        
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <button type="submit" class="btn btn-danger">Upload</button>
@@ -179,4 +299,16 @@
 @section scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
+<script type="text/javascript">
+    $('.form_datetime').datetimepicker({
+        language:  'en',
+        weekStart: 1,
+        todayBtn: 1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });
+</script>
 }

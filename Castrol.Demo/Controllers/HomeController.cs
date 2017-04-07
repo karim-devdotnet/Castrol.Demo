@@ -23,7 +23,7 @@ namespace Castrol.Demo.Controllers
             ViewBag.EditableData = editableData;
             model.CustomerName = HttpContext.Request.QueryString["customername"];
             model.Vehicle = HttpContext.Request.QueryString["vehicle"];
-            model.VehicleModel = HttpContext.Request.QueryString["model"];
+            model.VehicleModel = HttpContext.Request.QueryString["vehiclemodel"];
             model.Registration = HttpContext.Request.QueryString["registration"];
             model.VIN = HttpContext.Request.QueryString["vin"];
             model.Email = HttpContext.Request.QueryString["email"];
@@ -33,9 +33,9 @@ namespace Castrol.Demo.Controllers
             int.TryParse(HttpContext.Request.QueryString["mileage"], out mileage);
             model.Mileage = mileage;
 
-            model.EVHCDateTimeIn = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
-            model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
-            model.CarDateTimeDueOut = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
+            //model.EVHCDateTimeIn = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
+            //model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
+            //model.CarDateTimeDueOut = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
 
             return View(model);
         }
@@ -59,7 +59,7 @@ namespace Castrol.Demo.Controllers
                 SaveOnFtP();
 
             }
-            return RedirectToAction("Index",model);
+            return RedirectToAction("Index");
         }
 
        private void SaveOnFtP()

@@ -11,7 +11,7 @@ namespace Castrol.Demo.Models
     public class CastrolDataModel
     {
 
-        [Required, Display(Name = "Selected Customer Name")]
+        [Required(ErrorMessage ="This field is required!"), Display(Name = "Selected Customer Name*")]
         public string CustomerName { get; set; }
 
         [Display(Name = "Vehicle")]
@@ -23,8 +23,8 @@ namespace Castrol.Demo.Models
         /// <summary>
         /// Kennzeichen
         /// </summary>
-        [Required]
-        [Display(Name = "Registration")]
+        [Required(ErrorMessage = "This field is required!")]
+        [Display(Name = "Registration*")]
         public string Registration { get; set; }
 
         /// <summary>
@@ -33,8 +33,8 @@ namespace Castrol.Demo.Models
         [Display(Name = "Work Order Number")]
         public string WIP { get; set; }
 
-        [Required]
-        [Display(Name = "EVHC Date/Time In")]
+        [Required(ErrorMessage = "This field is required!")]
+        [Display(Name = "EVHC Date/Time In*")]
         public string EVHCDateTimeIn { get; set; }
 
         /// <summary>
