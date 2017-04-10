@@ -29,6 +29,7 @@ namespace Castrol.Demo.Controllers
             model.Email = HttpContext.Request.QueryString["email"];
             model.ContactPhone = HttpContext.Request.QueryString["telefon"];
             model.Fax = HttpContext.Request.QueryString["fax"];
+            model.WIP = "0";
             var mileage = 0;
             int.TryParse(HttpContext.Request.QueryString["mileage"], out mileage);
             model.Mileage = mileage;
@@ -45,6 +46,17 @@ namespace Castrol.Demo.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                //using (var stream = new StreamWriter(Server.MapPath("~/Upload/CastrolData.csv")))
+                //{
+                //    using (var csv = new CsvWriter(stream))
+                //    {
+                //        csv.Configuration.HasHeaderRecord = false;
+                //        csv.Configuration.Delimiter = ",";
+                //        csv.Configuration.QuoteAllFields = true;
+                //        csv.WriteRecord(model);
+                //    }
+                //}
 
                 using (var dataStream = new MemoryStream())
                 {
