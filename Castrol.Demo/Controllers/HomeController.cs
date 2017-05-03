@@ -13,9 +13,12 @@ using System.Web.Mvc;
 
 namespace Castrol.Demo.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly CultureInfo cultureInfo = new CultureInfo("en");
+        private const string FORM_VALIDATION_ERROR = "Es ist ein Fehler aufgetreten. Überprüfe Deine Eingaben und versuche es nochmal.";
+        private const string UPLOAD_SUCCESS = "Die Daten wurden per FTP erfolgreich hochgeladen";
+
         [HttpGet]
         public ActionResult Index(bool editableData = false)
         {
@@ -44,6 +47,7 @@ namespace Castrol.Demo.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult UploadCastrolData(CastrolDataModel model)
         {
+            TempData["ValidationError"] = null;
             if (ModelState.IsValid)
             {
 
@@ -62,24 +66,37 @@ namespace Castrol.Demo.Controllers
                 {
                     using (var stream = new StreamWriter(dataStream))
                     {
-                        using (var csv = new CsvWriter(stream))
+                        try
                         {
-                            csv.Configuration.HasHeaderRecord = false;
-                            csv.Configuration.Delimiter = ",";
-                            csv.Configuration.QuoteAllFields = true;
-                            csv.WriteRecord(model);
+                            using (var csv = new CsvWriter(stream))
+                            {
+                                csv.Configuration.HasHeaderRecord = false;
+                                csv.Configuration.Delimiter = ",";
+                                csv.Configuration.QuoteAllFields = true;
+                                csv.WriteRecord(model);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            SetActionState(FORM_VALIDATION_ERROR);
+                            return RedirectToAction("Index");
                         }
                     }
 
                     var data = dataStream.ToArray();
-                    SaveOnFtP(data);
+                    if(!SaveOnFtP(data))
+                    {
+                        SetActionState(FORM_VALIDATION_ERROR);
+                        return RedirectToAction("Index");
+                    }
                 }
 
             }
+            SetActionState(UPLOAD_SUCCESS, AlertType.success);
             return RedirectToAction("Index");
         }
 
-       private void SaveOnFtP(byte[] inData)
+        private bool SaveOnFtP(byte[] inData)
         {
             FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ ConfigurationManager.AppSettings["FtpServer"]}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
             ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
@@ -91,18 +108,18 @@ namespace Castrol.Demo.Controllers
             try
             {
                 WebResponse ftpResponse = ftpRequest.GetResponse();
+                using (Stream requestStream = ftpRequest.GetRequestStream())
+                {
+                    requestStream.Write(inData, 0, inData.Length);
+                }
+                FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
             }
-            catch (Exception ex)
+            catch
             {
-                throw;
+                return false;
             }
 
-            using (Stream requestStream = ftpRequest.GetRequestStream())
-            {
-                requestStream.Write(inData, 0, inData.Length);
-            }
-
-            FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
+            return true;
         }
 
     }

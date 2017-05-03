@@ -26,3 +26,10 @@ textarea {
 .input-group {
     padding-left:0 !important;
 }
+
+.castrol-header.navbar {
+    background-image: url("Images/castrol_header.jpg");
+    background-repeat:no-repeat;
+    background-position: center bottom;
+    background-size:100% 100%;
+}
