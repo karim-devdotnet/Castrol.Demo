@@ -19,7 +19,7 @@ namespace Castrol.Demo.Controllers
     public class HomeController : BaseController
     {
         private readonly CultureInfo cultureInfo = new CultureInfo("en");
-        private const string FORM_VALIDATION_ERROR = "Es ist ein Fehler aufgetreten. Überprüfe Deine Eingaben und versuche es nochmal.";
+        private const string FORM_VALIDATION_ERROR = "Es ist ein Fehler aufgetreten. Überprüfen Sie Ihre Eingaben und versuchen Sie es nochmal.";
         private const string UPLOAD_SUCCESS = "Die Daten wurden per FTP erfolgreich hochgeladen.";
         private CastrolContext db = new CastrolContext(MvcApplication.CastrolContextConnectionString);
         private static readonly ILog Log = LogManager.GetLogger(typeof(HomeController));
@@ -52,6 +52,19 @@ namespace Castrol.Demo.Controllers
             Dictionary<string, string> queryString = HttpContext.Request.Unvalidated.QueryString.ToDictionary();
             Log.Info($"QueryString: {System.Web.Helpers.Json.Encode(queryString)}");
 
+            //Get Credential from DB
+            UserData userData = db.GetUserData(model.UserID);
+            if(userData != null)
+            {
+                model.UserName = userData.UserName;
+                model.UserPassword = userData.UserPassword;
+            }
+            else
+            {
+                Log.Info($"Keine Benutzerdaten für UserId:{model.UserID} gefunden!");
+                model.CreateNewFTPCredentials = true;
+            }
+
             return View(model);
         }
 
@@ -61,6 +74,26 @@ namespace Castrol.Demo.Controllers
             TempData["ValidationError"] = null;
             if (ModelState.IsValid)
             {
+                UserData userData = new UserData
+                {
+                    UserId = model.UserID,
+                    UserName = model.UserName,
+                    UserPassword = model.UserPassword
+                };
+                //Set Credential from DB
+                if (model.CreateNewFTPCredentials)
+                {
+                    try
+                    {
+                        db.UserDataSet.Add(userData);
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex.Message, ex);
+                    }
+                }
+
                 using (var dataStream = new MemoryStream())
                 {
                     using (var stream = new StreamWriter(dataStream))
@@ -84,7 +117,7 @@ namespace Castrol.Demo.Controllers
                     }
 
                     var data = dataStream.ToArray();
-                    if(!SaveOnFtP(data,model.UserID))
+                    if(!UploadToWEB(data,userData))
                     {
                         SetActionState(FORM_VALIDATION_ERROR);
                         return View("Index", model);
@@ -96,33 +129,20 @@ namespace Castrol.Demo.Controllers
             return View("Index", model);
         }
 
-        private bool SaveOnFtP(byte[] inData, string userId)
+        public bool UploadToWEB(byte[] inData, UserData userData)
         {
-            try
+            using (WebClient wc = new WebClient())
             {
-                //Get Credential from DB
-                UserData userData = db.GetUserData(userId);
-                if (userData == null)
-                    return false;
-
-                FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
-                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-                ftpRequest.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
-                ftpRequest.UsePassive = true;
-                ftpRequest.UseBinary = true;
-                ftpRequest.KeepAlive = false;
-
-                WebResponse ftpResponse = ftpRequest.GetResponse();
-                using (Stream requestStream = ftpRequest.GetRequestStream())
+                wc.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
+                try
                 {
-                    requestStream.Write(inData, 0, inData.Length);
+                    wc.UploadData($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv", inData);
                 }
-                FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
-                return false;
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message, ex);
+                    return false;
+                }
             }
 
             return true;

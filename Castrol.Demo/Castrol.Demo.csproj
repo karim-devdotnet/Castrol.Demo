@@ -250,11 +250,6 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Specification\Castrol EVHC FTP Upload.pdf" />
-    <Content Include="Views\UserDatas\Create.cshtml" />
-    <Content Include="Views\UserDatas\Delete.cshtml" />
-    <Content Include="Views\UserDatas\Details.cshtml" />
-    <Content Include="Views\UserDatas\Edit.cshtml" />
-    <Content Include="Views\UserDatas\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
