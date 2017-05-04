@@ -77,5 +77,10 @@ namespace Castrol.Demo.Models
         [Display(Name = "Customer Waiting")]
         public int CustomerWaiting { get; set; }
 
+        /// <summary>
+        /// Kunden ID
+        /// </summary>
+        public string UserID { get; set; }
+
     }
 }

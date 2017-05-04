@@ -1,4 +1,5 @@
-﻿using Castrol.Demo.Models;
+﻿using Castrol.Context;
+using Castrol.Demo.Models;
 using CsvHelper;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace Castrol.Demo.Controllers
     {
         private readonly CultureInfo cultureInfo = new CultureInfo("en");
         private const string FORM_VALIDATION_ERROR = "Es ist ein Fehler aufgetreten. Überprüfe Deine Eingaben und versuche es nochmal.";
-        private const string UPLOAD_SUCCESS = "Die Daten wurden per FTP erfolgreich hochgeladen";
+        private const string UPLOAD_SUCCESS = "Die Daten wurden per FTP erfolgreich hochgeladen.";
+        private CastrolContext db = new CastrolContext(MvcApplication.CastrolContextConnectionString);
 
         [HttpGet]
         public ActionResult Index(bool editableData = false)
@@ -36,6 +38,7 @@ namespace Castrol.Demo.Controllers
             var mileage = 0;
             int.TryParse(HttpContext.Request.QueryString["mileage"], out mileage);
             model.Mileage = mileage;
+            model.UserID = HttpContext.Request.QueryString["kid"];
 
             //model.EVHCDateTimeIn = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
             //model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
@@ -50,18 +53,6 @@ namespace Castrol.Demo.Controllers
             TempData["ValidationError"] = null;
             if (ModelState.IsValid)
             {
-
-                //using (var stream = new StreamWriter(Server.MapPath("~/Upload/CastrolData.csv")))
-                //{
-                //    using (var csv = new CsvWriter(stream))
-                //    {
-                //        csv.Configuration.HasHeaderRecord = false;
-                //        csv.Configuration.Delimiter = ",";
-                //        csv.Configuration.QuoteAllFields = true;
-                //        csv.WriteRecord(model);
-                //    }
-                //}
-
                 using (var dataStream = new MemoryStream())
                 {
                     using (var stream = new StreamWriter(dataStream))
@@ -79,28 +70,33 @@ namespace Castrol.Demo.Controllers
                         catch (Exception)
                         {
                             SetActionState(FORM_VALIDATION_ERROR);
-                            return RedirectToAction("Index");
+                            return View("Index", model);
                         }
                     }
 
                     var data = dataStream.ToArray();
-                    if(!SaveOnFtP(data))
+                    if(!SaveOnFtP(data,model.UserID))
                     {
                         SetActionState(FORM_VALIDATION_ERROR);
-                        return RedirectToAction("Index");
+                        return View("Index", model);
                     }
                 }
 
             }
             SetActionState(UPLOAD_SUCCESS, AlertType.success);
-            return RedirectToAction("Index");
+            return View("Index", model);
         }
 
-        private bool SaveOnFtP(byte[] inData)
+        private bool SaveOnFtP(byte[] inData, string userId)
         {
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ ConfigurationManager.AppSettings["FtpServer"]}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
+            //Get Credential from DB
+            UserData userData = db.GetUserData(userId);
+            if (userData == null)
+                return false;
+
+            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
             ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-            ftpRequest.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["FtpUser"], ConfigurationManager.AppSettings["FtpPassword"]);
+            ftpRequest.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
             ftpRequest.UsePassive = true;
             ftpRequest.UseBinary = true;
             ftpRequest.KeepAlive = false;
@@ -122,5 +118,13 @@ namespace Castrol.Demo.Controllers
             return true;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }
