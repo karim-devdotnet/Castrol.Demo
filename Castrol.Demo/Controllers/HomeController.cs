@@ -1,6 +1,8 @@
 ﻿using Castrol.Context;
+using Castrol.Demo.Extensions;
 using Castrol.Demo.Models;
 using CsvHelper;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,6 +22,8 @@ namespace Castrol.Demo.Controllers
         private const string FORM_VALIDATION_ERROR = "Es ist ein Fehler aufgetreten. Überprüfe Deine Eingaben und versuche es nochmal.";
         private const string UPLOAD_SUCCESS = "Die Daten wurden per FTP erfolgreich hochgeladen.";
         private CastrolContext db = new CastrolContext(MvcApplication.CastrolContextConnectionString);
+        private static readonly ILog Log = LogManager.GetLogger(typeof(HomeController));
+
 
         [HttpGet]
         public ActionResult Index(bool editableData = false)
@@ -44,6 +48,10 @@ namespace Castrol.Demo.Controllers
             //model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
             //model.CarDateTimeDueOut = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
 
+            //QueryString
+            Dictionary<string, string> queryString = HttpContext.Request.Unvalidated.QueryString.ToDictionary();
+            Log.Info($"QueryString: {System.Web.Helpers.Json.Encode(queryString)}");
+
             return View(model);
         }
 
@@ -67,8 +75,9 @@ namespace Castrol.Demo.Controllers
                                 csv.WriteRecord(model);
                             }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            Log.Error(ex.Message, ex);
                             SetActionState(FORM_VALIDATION_ERROR);
                             return View("Index", model);
                         }
@@ -89,20 +98,20 @@ namespace Castrol.Demo.Controllers
 
         private bool SaveOnFtP(byte[] inData, string userId)
         {
-            //Get Credential from DB
-            UserData userData = db.GetUserData(userId);
-            if (userData == null)
-                return false;
-
-            FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
-            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
-            ftpRequest.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
-            ftpRequest.UsePassive = true;
-            ftpRequest.UseBinary = true;
-            ftpRequest.KeepAlive = false;
-
             try
             {
+                //Get Credential from DB
+                UserData userData = db.GetUserData(userId);
+                if (userData == null)
+                    return false;
+
+                FtpWebRequest ftpRequest = (FtpWebRequest)WebRequest.Create($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv");
+                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+                ftpRequest.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
+                ftpRequest.UsePassive = true;
+                ftpRequest.UseBinary = true;
+                ftpRequest.KeepAlive = false;
+
                 WebResponse ftpResponse = ftpRequest.GetResponse();
                 using (Stream requestStream = ftpRequest.GetRequestStream())
                 {
@@ -110,8 +119,9 @@ namespace Castrol.Demo.Controllers
                 }
                 FtpWebResponse response = (FtpWebResponse)ftpRequest.GetResponse();
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 return false;
             }
 

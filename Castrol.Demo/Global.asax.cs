@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -13,9 +14,12 @@ namespace Castrol.Demo
     {
         public static string CastrolContextConnectionString { get; set; }
         public static string FtpServer { get; set; }
-
+        
         protected void Application_Start()
         {
+            //init Logfile 
+            log4net.Config.XmlConfigurator.Configure();
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
