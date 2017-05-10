@@ -1,0 +1,3 @@
+2017-05-09 16:32:45,329 [10] INFO : Castrol.Demo.Controllers.HomeController -> QueryString: {}
+2017-05-09 16:32:45,338 [10] INFO : Castrol.Demo.Controllers.HomeController -> Keine Benutzerdaten für UserId: gefunden!
+2017-05-09 16:34:10,241 [17] INFO : Castrol.Demo.Controllers.HomeController -> QueryString: {"editabledata":"true","vehicle":"BMW","vehiclemodel":"5 Touring (E61) 525 d","kid":"4891","customername":"Abdel","registration":"ME JN 2334","vin":"WBANJ51090B410473","email":"joaquimneumann@gmail.com","mileage":"232667"}
