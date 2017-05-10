@@ -63,3 +63,4 @@
 #*.RTF   diff=astextplain
 
 *.config filter=gitignore
+*.txt filter=gitignore
