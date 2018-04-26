@@ -44,11 +44,7 @@ namespace Castrol.Demo.Controllers
             model.Mileage = mileage;
             model.UserID = HttpContext.Request.QueryString["kid"];
 
-            //model.EVHCDateTimeIn = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
-            //model.DateVehicleFirstRegistered = String.Format(cultureInfo,"{0:MM/dd/yyyy}", DateTime.Now);
-            //model.CarDateTimeDueOut = String.Format(cultureInfo,"{0:MM/dd/yyyy HH:mm}", DateTime.Now);
-
-            //QueryString
+            //Log QueryString
             Dictionary<string, string> queryString = HttpContext.Request.Unvalidated.QueryString.ToDictionary();
             Log.Info($"QueryString: {System.Web.Helpers.Json.Encode(queryString)}");
 
@@ -61,9 +57,11 @@ namespace Castrol.Demo.Controllers
             }
             else
             {
-                Log.Info($"Keine Benutzerdaten für UserId:{model.UserID} gefunden!");
+                Log.Info($"Keine FTP Anmeldedaten für UserId:{model.UserID} gefunden!");
                 model.CreateNewFTPCredentials = true;
             }
+
+            model.ShowFTPLoginData = string.IsNullOrEmpty(model.UserID) || string.IsNullOrEmpty(model.UserName);
 
             return View(model);
         }
@@ -85,8 +83,18 @@ namespace Castrol.Demo.Controllers
                 {
                     try
                     {
-                        db.UserDataSet.Add(userData);
+                        UserData userDataEntity = db.GetUserData(model.UserID);
+                        if(userDataEntity != null)
+                        {
+                            userDataEntity.UserName = model.UserName;
+                            userDataEntity.UserPassword = model.UserPassword;
+                        }
+                        else
+                        {
+                            db.UserDataSet.Add(userData);
+                        }
                         db.SaveChanges();
+                        Log.Info($"Neue FTP Anmeldedaten für UserId:{userData.UserId} ({userData.UserName}/{userData.UserPassword}) hinzugefügt!");
                     }
                     catch (Exception ex)
                     {
@@ -94,11 +102,11 @@ namespace Castrol.Demo.Controllers
                     }
                 }
 
-                using (var dataStream = new MemoryStream())
+                try
                 {
-                    using (var stream = new StreamWriter(dataStream))
+                    using (var dataStream = new MemoryStream())
                     {
-                        try
+                        using (var stream = new StreamWriter(dataStream))
                         {
                             using (var csv = new CsvWriter(stream))
                             {
@@ -107,45 +115,37 @@ namespace Castrol.Demo.Controllers
                                 csv.Configuration.QuoteAllFields = true;
                                 csv.WriteRecord(model);
                             }
+                            
                         }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex.Message, ex);
-                            SetActionState(FORM_VALIDATION_ERROR);
-                            return View("Index", model);
-                        }
-                    }
 
-                    var data = dataStream.ToArray();
-                    if(!UploadToWEB(data,userData))
-                    {
-                        SetActionState(FORM_VALIDATION_ERROR);
-                        return View("Index", model);
+                        UploadToWEB(dataStream.ToArray(), userData);
                     }
                 }
+                catch (Exception ex)
+                {
+                    model.ShowFTPLoginData = true;
+                    model.CreateNewFTPCredentials = true;
 
+                    Log.Error(ex.Message, ex);
+                    SetActionState(ex.Message);
+                    return View("Index", model);
+                }
+
+                //Log Form params
+                Dictionary<string, string> queryString = HttpContext.Request.Unvalidated.Form.ToDictionary();
+                SetActionState(UPLOAD_SUCCESS, AlertType.success);
+                Log.Info($"{UPLOAD_SUCCESS}, Form params: {System.Web.Helpers.Json.Encode(queryString)}");
             }
-            SetActionState(UPLOAD_SUCCESS, AlertType.success);
             return View("Index", model);
         }
 
-        public bool UploadToWEB(byte[] inData, UserData userData)
+        public void UploadToWEB(byte[] inData, UserData userData)
         {
             using (WebClient wc = new WebClient())
             {
                 wc.Credentials = new NetworkCredential(userData.UserName, userData.UserPassword);
-                try
-                {
-                    wc.UploadData($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv", inData);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex.Message, ex);
-                    return false;
-                }
+                wc.UploadData($"{ MvcApplication.FtpServer}/CastrolData_{DateTime.Now.ToString("yyyyMMddHHmmss")}.csv", inData);
             }
-
-            return true;
         }
 
         protected override void Dispose(bool disposing)

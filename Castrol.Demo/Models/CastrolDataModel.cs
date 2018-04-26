@@ -91,5 +91,7 @@ namespace Castrol.Demo.Models
 
         public bool CreateNewFTPCredentials { get; set; }
 
+        public bool ShowFTPLoginData { get; set; }
+
     }
 }

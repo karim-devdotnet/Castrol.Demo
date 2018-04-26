@@ -5,7 +5,7 @@
 }
 <div class="row">
     <div class="col-xs-12">
-        <h2>Castrol EVHC Data Entry via FTP</h2>
+        <h2>Castrol EVHC Daten-Übertragung via FTP</h2>
         <hr />
     </div>
 </div>
@@ -298,7 +298,7 @@
             </div>
 
         @*FTP Anmeldedaten*@
-        @if (string.IsNullOrEmpty(Model.UserID) || string.IsNullOrEmpty(Model.UserName))
+        @if (Model.ShowFTPLoginData)
         {
             @Html.HiddenFor(m =>m.CreateNewFTPCredentials)
             <h3>Bitte geben Sie Ihre FTP Anmeldedaten ein.</h3>
@@ -347,7 +347,7 @@
     @Scripts.Render("~/bundles/jqueryval")
 <script type="text/javascript">
     $('.form_datetime').datetimepicker({
-        language:  'en',
+        language:  'de',
         weekStart: 1,
         todayBtn: 1,
         autoclose: 1,
